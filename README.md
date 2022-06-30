@@ -12,7 +12,8 @@ Video call 1-1, agora SDK, Firebase (FCM)
   <li>rxjs</li>
   <li>typescript</li>
 </ol>
-## BE (.Net 6)
+
+## 2 BE (.Net 6)
 <ol>
   <li>Code first, EF Core migrations</li>
   <li>Web API</li>
