@@ -101,7 +101,7 @@ namespace AgoraCallVideo.Controllers
         [HttpGet("set-finish-calling")]
         public async Task<IActionResult> SetFinishCalling()
         {
-            // khi user ket thuc cuoc goi, thi set lai = false
+            // khi user ket thuc cuoc goi hoac cancel cuoc goi, thi set lai = false
             await _presenceTracker.SetCallingForUsername(User.Identity.Name, false);
             return NoContent();
         }

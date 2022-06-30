@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef } from "react";
 import { Button, Modal } from "react-bootstrap";
+import agent from "../../api/agent";
 import { useStore } from "../../stores/stores";
 import { openCallingAnswerService } from "../services/openCallingAnswer";
 
@@ -17,9 +18,8 @@ export default observer(function ModalMakeACallAnswer() {
 
     useEffect(() => {
         //tuong tac dom 1 cach gian tiep, tuong tu nhu user click vao button play
-        //su dung buoc trung gian nay de ngan ngua loi: play() failed because the user didn't interact with the document first.
-        if(userStore.channelName)
-            buttonPlayAudioRef.current.click();//play sound
+        //su dung buoc trung gian nay de ngan ngua loi: play() failed because the user didn't interact with the document first.        
+        //buttonPlayAudioRef.current.click();//play sound
     }, [])
 
     return (
@@ -39,6 +39,7 @@ export default observer(function ModalMakeACallAnswer() {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={() => {
+                        agent.FirebaseAdminSDK.setFinishCalling();
                         audioStore.setPlaying(false);
                         modalMakeACallAnswer.closeModal();
                     }}>
