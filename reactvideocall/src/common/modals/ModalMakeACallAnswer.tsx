@@ -39,6 +39,7 @@ export default observer(function ModalMakeACallAnswer() {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={() => {
+                        userStore.setChannel(null);
                         agent.FirebaseAdminSDK.setFinishCalling();
                         audioStore.setPlaying(false);
                         modalMakeACallAnswer.closeModal();
