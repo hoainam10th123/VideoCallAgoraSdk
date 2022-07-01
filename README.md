@@ -33,6 +33,7 @@ bật Cloud Messaging API thì app server mới gửi message đi được.</li>
   <li>Firebase Admin</li>
 </ol>
 
+![video call 1](background.png)
 ![video call 1](agora1.png)
 ![video call 1](agora2.png)
 ![video call 1](agora3.png)
