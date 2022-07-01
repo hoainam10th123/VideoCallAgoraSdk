@@ -1,7 +1,6 @@
 using AgoraCallVideo.Data;
 using AgoraCallVideo.Entities;
 using AgoraCallVideo.Extensions;
-using AgoraCallVideo.Extensions.GoogleCloud;
 using AgoraCallVideo.Middleware;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -26,9 +25,9 @@ builder.Services.AddCors(options =>
 FirebaseApp.Create(new AppOptions()
 {
     //GOOGLE_APPLICATION_CREDENTIALS="E:\Download\service-account-file.json"
-    //Credential = GoogleCredential.GetApplicationDefault(), // lay tu bien moi truong
-    Credential = (GoogleCredential)new HandCodedLibrary().AuthExplicit("chat-app-react-66942",
-    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "firebase-service-account-file.json"))
+    Credential = GoogleCredential.GetApplicationDefault(), // lay tu bien moi truong
+    //Credential = (GoogleCredential)new HandCodedLibrary().AuthExplicit("chat-app-react-66942",
+    //Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "firebase-service-account-file.json"))
 });
 
 // Add services to the container.

@@ -52,8 +52,9 @@ namespace AgoraCallVideo.Controllers
         public async Task<IActionResult> FindUserTongDai(string channel)
         {
             var tongDaiVien = await _presenceTracker.TimTongDaiVien();
+            if (tongDaiVien == null) await SendNotificationBackToSender(User.Identity.Name);// tong dai ban
             // notification toi tong dai vien
-            await SendNotification(User.Identity.Name, tongDaiVien.Username, channel);
+            else await SendNotification(User.Identity.Name, tongDaiVien.Username, channel);                        
             return NoContent();
         }
 
@@ -68,10 +69,34 @@ namespace AgoraCallVideo.Controllers
                     Data = new Dictionary<string, string>()
                     {
                         { "channel", data },
-                        { "time", "2:45" },
+                        { "usernameTo", usernameTo },
                     },
                     Token = userFcm.TokenFcm,
                     Notification = new Notification { Title = "Cuộc gọi đến", Body = $"Cuộc gọi từ {userFrom.DisplayName}" }
+                };
+
+                // Send a message to the device corresponding to the provided
+                // registration token.
+                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                // Response is a message ID string.
+                Console.WriteLine("Successfully sent message: " + response);
+            }
+        }
+
+        private async Task SendNotificationBackToSender(string usernameFrom)
+        {
+            var userFcm = await _presenceTracker.GetUserforUsername(usernameFrom);
+            if (userFcm != null)
+            {
+                var message = new Message()
+                {
+                    Data = new Dictionary<string, string>()
+                    {
+                        { "channel", null },
+                        { "usernameTo", usernameFrom },
+                    },
+                    Token = userFcm.TokenFcm,
+                    Notification = new Notification { Title = "Tổng đài bận", Body = "Hiện tại các tổng đài viên đều bận" }
                 };
 
                 // Send a message to the device corresponding to the provided
@@ -90,6 +115,7 @@ namespace AgoraCallVideo.Controllers
             return NoContent();
         }
 
+        [AllowAnonymous]
         [HttpGet("user-disconnected")]
         public async Task<IActionResult> UserDisconnected()
         {

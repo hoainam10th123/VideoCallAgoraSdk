@@ -11,7 +11,7 @@ import TestErrors from './features/errors/TestErrors';
 import ModalMakeACallAnswer from './common/modals/ModalMakeACallAnswer';
 import { useStore } from './stores/stores';
 import { observer } from 'mobx-react-lite';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { openCallingAnswerService } from './common/services/openCallingAnswer';
 import CallOneToOneModal from './common/components/CallOneToOne';
 import HomePage from './features/home/Home';
@@ -43,9 +43,10 @@ const analytics = getAnalytics(app);
 const messaging = getMessaging(app);
 
 function App() {
-  const { userStore, modalMakeACallAnswer, audioStore, modalStore } = useStore();  
+  const { userStore, modalMakeACallAnswer, modalStore } = useStore();  
   const buttonCallOneToOneRef = useRef<any>(null);
   const buttonNgheCuocGoiRef = useRef<any>(null);
+  const [token, setToken] = useState('');
 
   // Things to do before unloading/closing the tab
   const disconnectedBeforeUnload = async () => {
@@ -67,6 +68,7 @@ function App() {
       //token cua firebase
       getToken(messaging, { vapidKey: 'BIRizgVLNDLwllmYcH6NbY1kSyaXkS29uGUOaHKa1PyJ3a3W-BaXiYtRS1y9I425xDfsrTtvYzRQkZpbNzSrlwE' }).then((currentToken) => {
         if (currentToken) {
+          setToken(currentToken);
           agent.FirebaseAdminSDK.addToken(currentToken).then(() => toast.success('add token FCM thanh cong'))
         } else {
           // Show permission request UI
@@ -82,12 +84,17 @@ function App() {
     openCallingAnswerService.getMessage().subscribe(data => {
       if (data) buttonNgheCuocGoiRef.current.click();
     })
-
     //Foreground
     onMessage(messaging, (payload) => {
       console.log('Message received. ', payload);
-      userStore.setChannel(payload.data!.channel);
-      modalMakeACallAnswer.openModal(payload.notification?.body!);
+      if(payload.data!.usernameTo === userStore.user?.username){
+        if(payload.data!.channel){
+          userStore.setChannel(payload.data!.channel);
+          modalMakeACallAnswer.openModal(payload.notification?.body!); 
+        }else{
+          toast.info(payload.notification?.body!);
+        }
+      }
     });
 
   }, [userStore.user])
@@ -103,6 +110,7 @@ function App() {
 
       <MenuBar />
       <Container>
+        <div>{token}</div>
         <Routes>
           <Route index element={
             (<PrivateWrapper><HomePage /></PrivateWrapper>)
