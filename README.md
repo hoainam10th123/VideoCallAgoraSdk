@@ -7,7 +7,8 @@ bật Cloud Messaging API thì app server mới gửi message đi được.</li>
   <li>Sau khi generate a private key file thì Tạo biến môi trường **GOOGLE_APPLICATION_CREDENTIALS** trỏ đường dẫn đến file mà firebase vừa tạo như hình dưới, sau đó log out và login lại để nhận biến vừa tạo</li>
   <li>Xong cấu hình, chạy thôi, khá là phức tạp đúng không</li>
 </ol>
-![video call 1](enviroment.png)
+
+![biến môi trường](enviroment.png)
 
 # Video call 1-1, agora SDK, Firebase (FCM)
 ## 1 FE (React 18):
