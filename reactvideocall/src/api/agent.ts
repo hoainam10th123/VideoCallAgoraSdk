@@ -45,6 +45,7 @@ axios.interceptors.response.use(async respone => {
             history.push('/not-found');
             break;
         case 500:
+            toast.error('500 internal server!');
             store.commonStore.setServerError(data as any);
             history.push('/server-error');
             break;
@@ -71,11 +72,12 @@ const Account = {
 }
 
 const FirebaseAdminSDK = {
-    setFinishCalling: () => requests.get<void>('FirebaseAdmin/set-finish-calling'),
+    setFinishCalling: (isCalling: boolean) => requests.get<void>('FirebaseAdmin/set-calling/'+isCalling),
     addToken: (token: string) => requests.post<void>('FirebaseAdmin/add-token/'+token, {}),
     sendNotificationSpecific: (username: string) => requests.post<void>('FirebaseAdmin/send-notification-specific/'+username, {}),
     userDisconnected: () => requests.get<void>('FirebaseAdmin/user-disconnected/'),
-    timUserTongDai: (channel: string) => requests.post<void>('FirebaseAdmin/tim-tong-dai-vien/'+channel, {}),
+    timUserTongDai: (data: string) => requests.post<void>('FirebaseAdmin/tim-tong-dai-vien/'+data, {}),
+    denyCall: (username: string) => requests.get<void>('FirebaseAdmin/get-tu-choi/'+username),
 }
 
 const Agora = {

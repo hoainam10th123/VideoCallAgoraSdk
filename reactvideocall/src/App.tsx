@@ -87,14 +87,23 @@ function App() {
     //Foreground
     onMessage(messaging, (payload) => {
       console.log('Message received. ', payload);
-      if(payload.data!.usernameTo === userStore.user?.username){
-        if(payload.data!.channel){
-          userStore.setChannel(payload.data!.channel);
-          modalMakeACallAnswer.openModal(payload.notification?.body!); 
-        }else{
+      
+      switch (payload.data!.statusCode) {
+        case "DENY":
+          toast.info('Từ chối cuộc gọi');
+          break;
+        case "ONE_ONE":
+          const model = JSON.parse(payload.data!.responseData);
+          userStore.setChannel(model.channel, model.username);
+          modalMakeACallAnswer.openModal(payload.notification?.body!);
+          break;
+        case "CALLER":
           toast.info(payload.notification?.body!);
-        }
+          break;
+        default:
+          break;
       }
+
     });
 
   }, [userStore.user])

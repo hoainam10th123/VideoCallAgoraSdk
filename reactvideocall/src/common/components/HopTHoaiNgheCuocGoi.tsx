@@ -34,8 +34,8 @@ export default observer(function HopTHoaiNgheCuocGoi() {
 
         return () => { 
             leave();
-            userStore.setChannel(null);
-            agent.FirebaseAdminSDK.setFinishCalling();
+            userStore.setChannel(null, null);
+            agent.FirebaseAdminSDK.setFinishCalling(false);
         }
 
     }, [])

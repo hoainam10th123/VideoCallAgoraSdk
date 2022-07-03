@@ -19,11 +19,12 @@ export default observer(function CallOneToOneModal() {
 
     useEffect(() => {
         const chanelName = userStore.channelName ?? userStore.user?.username;
+        const model = {channel: chanelName, username: userStore.user?.username};
 
         agent.Agora.getRtcToken({ uid: userStore.user?.username, channelName: chanelName }).then(token => {
             try {
                 join('9c29102f9b5749988c092d4d9bab52e9', chanelName, token, userStore.user?.username);                
-                agent.FirebaseAdminSDK.timUserTongDai(chanelName!);//notification toi tong dai vien
+                agent.FirebaseAdminSDK.timUserTongDai(JSON.stringify(model));//notification toi tong dai vien
             } catch (error) {
                 console.error(error);
                 toast.error('FirebaseAdminSDK.timUserTongDai error');
@@ -35,8 +36,8 @@ export default observer(function CallOneToOneModal() {
 
         return () => { 
             leave();
-            userStore.setChannel(null);
-            agent.FirebaseAdminSDK.setFinishCalling();
+            userStore.setChannel(null, null);
+            agent.FirebaseAdminSDK.setFinishCalling(false);
         }
 
     }, [])

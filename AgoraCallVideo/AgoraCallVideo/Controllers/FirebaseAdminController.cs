@@ -21,54 +21,60 @@ namespace AgoraCallVideo.Controllers
             _unitOfWork = unitOfWork;
         }        
 
-        //[HttpPost("send-notification-specific/{username}")]
-        //public async Task<IActionResult> SendNotificationSpecific(string username)
-        //{
-        //    var userFcm = await _presenceTracker.GetUserforUsername(username);
-        //    if (userFcm != null)
-        //    {
-        //        var message = new Message()
-        //        {
-        //            Data = new Dictionary<string, string>()
-        //            {
-        //                { "channel", "test" },
-        //                { "time", "2:45" },
-        //            },
-        //            Token = userFcm.TokenFcm,
-        //            Notification = new Notification { Title = "Title test", Body = "body test" }
-        //        };
-
-        //        // Send a message to the device corresponding to the provided
-        //        // registration token.
-        //        string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
-        //        // Response is a message ID string.
-        //        Console.WriteLine("Successfully sent message: " + response);
-        //    }
-
-        //    return NoContent();
-        //}
-
-        [HttpPost("tim-tong-dai-vien/{channel}")]
-        public async Task<IActionResult> FindUserTongDai(string channel)
+        [HttpPost("tim-tong-dai-vien/{data}")]
+        public async Task<IActionResult> FindUserTongDai(string data)//data is json {channel, username}
         {
             var tongDaiVien = await _presenceTracker.TimTongDaiVien();
-            if (tongDaiVien == null) await SendNotificationBackToSender(User.Identity.Name);// tong dai ban
+            if (tongDaiVien == null) await SendNotificationBackToSender(User.Identity.Name, "Tổng đài bận", "Hiện tại các tổng đài viên đều bận", "data");// tong dai ban
             // notification toi tong dai vien
-            else await SendNotification(User.Identity.Name, tongDaiVien.Username, channel);                        
+            else await SendNotification(User.Identity.Name, tongDaiVien.Username, data);                        
             return NoContent();
+        }
+
+        [HttpGet("get-tu-choi/{username}")]
+        public async Task<IActionResult> TuChoiCuocGoi(string username)
+        {
+            await SendNotificationDenyCall(username, "data");
+            return NoContent();
+        }
+
+        private async Task SendNotificationDenyCall(string usernameTo, string data)
+        {
+            var userFcm = await _presenceTracker.GetUserforUsername(usernameTo);
+            if (userFcm != null)
+            {                
+                var message = new Message()
+                {
+                    Data = new Dictionary<string, string>()
+                    {
+                        { "statusCode", "DENY" },
+                        { "responseData", data },
+                        { "usernameTo", usernameTo },
+                    },
+                    Token = userFcm.TokenFcm,
+                    Notification = new Notification { Title = "Từ chối", Body = "Tổng đài viên từ chối cuộc gọi" }
+                };
+
+                // Send a message to the device corresponding to the provided
+                // registration token.
+                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                // Response is a message ID string.
+                Console.WriteLine("Successfully sent message: " + response);
+            }
         }
 
         private async Task SendNotification(string usernameFrom, string usernameTo, string data)
         {
             var userFcm = await _presenceTracker.GetUserforUsername(usernameTo);
             if (userFcm != null)
-            {
+            {                
                 var userFrom = await _unitOfWork.UserRepository.GetUserByUsernameAsync(usernameFrom);
                 var message = new Message()
                 {
                     Data = new Dictionary<string, string>()
                     {
-                        { "channel", data },
+                        { "statusCode", "ONE_ONE" },
+                        { "responseData", data },
                         { "usernameTo", usernameTo },
                     },
                     Token = userFcm.TokenFcm,
@@ -83,7 +89,7 @@ namespace AgoraCallVideo.Controllers
             }
         }
 
-        private async Task SendNotificationBackToSender(string usernameFrom)
+        private async Task SendNotificationBackToSender(string usernameFrom, string titleNotification, string bodyNotification, string data)
         {
             var userFcm = await _presenceTracker.GetUserforUsername(usernameFrom);
             if (userFcm != null)
@@ -92,11 +98,12 @@ namespace AgoraCallVideo.Controllers
                 {
                     Data = new Dictionary<string, string>()
                     {
-                        { "channel", null },
+                        { "statusCode", "CALLER" },
+                        { "responseData", data },
                         { "usernameTo", usernameFrom },
                     },
                     Token = userFcm.TokenFcm,
-                    Notification = new Notification { Title = "Tổng đài bận", Body = "Hiện tại các tổng đài viên đều bận" }
+                    Notification = new Notification { Title = titleNotification, Body = bodyNotification }
                 };
 
                 // Send a message to the device corresponding to the provided
@@ -124,11 +131,11 @@ namespace AgoraCallVideo.Controllers
             return NoContent();
         }
 
-        [HttpGet("set-finish-calling")]
-        public async Task<IActionResult> SetFinishCalling()
+        [HttpGet("set-calling/{iscalling}")]
+        public async Task<IActionResult> SetFinishCalling(bool iscalling)
         {
             // khi user ket thuc cuoc goi hoac cancel cuoc goi, thi set lai = false
-            await _presenceTracker.SetCallingForUsername(User.Identity.Name, false);
+            await _presenceTracker.SetCallingForUsername(User.Identity.Name, iscalling);
             return NoContent();
         }
 

@@ -10,6 +10,7 @@ export default observer(function ModalMakeACallAnswer() {
     const buttonPlayAudioRef = useRef<any>(null);
 
     function traLoiCuocGoi() {
+        agent.FirebaseAdminSDK.setFinishCalling(true);
         audioStore.setPlaying(false);
         modalMakeACallAnswer.closeModal();
         // mo hop thoai call 1-1
@@ -39,9 +40,12 @@ export default observer(function ModalMakeACallAnswer() {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={() => {
-                        userStore.setChannel(null);
-                        agent.FirebaseAdminSDK.setFinishCalling();
-                        audioStore.setPlaying(false);
+                        agent.FirebaseAdminSDK.denyCall(userStore.username!).then(()=> {
+                            userStore.setChannel(null, null);
+                        });
+                                                
+                        agent.FirebaseAdminSDK.setFinishCalling(false);
+                        //audioStore.setPlaying(false);
                         modalMakeACallAnswer.closeModal();
                     }}>
                         Cancel
